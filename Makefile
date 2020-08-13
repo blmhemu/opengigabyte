@@ -12,7 +12,7 @@ MODULEDIR?=/lib/modules/$(shell uname -r)/kernel/drivers/hid
 PYTHONDIR?=$(shell python3 -c 'import sys; print(sys.path[-1])')
 
 DKMS_NAME?=opengigabyte-driver
-DKMS_VER?=0.0.1
+DKMS_VER?=0.0.2
 
 
 # Build all target
