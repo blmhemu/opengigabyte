@@ -21,7 +21,17 @@ A collection of Linux drivers of various components for Gigabyte devices.
 | Gigabyte Aero 15 SA                           |  1044:7A3F  |
 
 ## Install Instructions
-**Arch :** 
+
+### Ubuntu : 
+```
+sudo add-apt-repository ppa:blmhemu/opengigabyte
+sudo apt update
+sudo apt install opengigabyte-driver-dkms
+```
+
+### Arch :
+
+*Note:* Currently not maintained
 ```
 pacman -S linux-headers
 pacman -S openaero-meta
@@ -31,8 +41,11 @@ pacman -S openaero-meta
 * The keyboard driver converts the obscure key codes from the keyboard into standard keycodes. Handling the functionality of the keys is up to the user.
   * For example, link the BrightnessUp / BrightnessDown keyboard symbol to [light utility](https://github.com/haikarainen/light) or xbacklight to control brightness using the keys.
 
+## Releases / Changelog 
+https://github.com/blmhemu/opengigabyte/releases
+
 ## Credits
 * [OpenRazer](https://openrazer.github.io/)
 
 ---
-The project is licensed under the GPL and is not officially endorsed by [Gigabyte, Ltd](https://www.gigabyte.com//).
+The project is licensed under the GPL and is not officially endorsed by [Gigabyte, Ltd](https://www.gigabyte.com//)
