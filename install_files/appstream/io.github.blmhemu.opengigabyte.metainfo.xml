@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <id>io.github.blmhemu.opengigabyte</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>OpenGigabyte</name>
+  <summary>Drivers for Aero peripherals on GNU/Linux</summary>
+  <description>
+    <p>
+      OpenGigabyte is a collection of GNU/Linux drivers for the Gigabyte devices.
+      Supported devices include keyboards, mice, mouse-mats, headsets and
+      various other devices. OpenGigabyte provides kernel drivers, DBus services
+      and python bindings to interact with the DBus interface.
+    </p>
+  </description>
+  <!-- <url type="homepage">https://blmhemu.github.io/openaero/</url> -->
+  <provides>
+    <modalias>usb:v1044p7A39d*</modalias>
+    <modalias>usb:v1044p7A3Fd*</modalias>
+  </provides>
+</component>

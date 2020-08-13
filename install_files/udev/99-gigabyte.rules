@@ -1,0 +1,21 @@
+ACTION!="add", GOTO="gigabyte_end"
+SUBSYSTEMS=="usb|input|hid", ATTRS{idVendor}=="1044", GOTO="gigabyte_vendor"
+GOTO="gigabyte_end"
+
+LABEL="gigabyte_vendor"
+
+# Keyboards
+ATTRS{idProduct}=="7A39|7A3F", \
+    ATTRS{idVendor}=="1044", \
+    ENV{GIGABYTE_DRIVER}="gigabytekbd"
+
+# Set permissions if this is an input node
+# SUBSYSTEM=="input|hid", GROUP:="plugdev"
+
+# We're done unless it's the hid node
+SUBSYSTEM!="hid", GOTO="gigabyte_end"
+
+# Rebind if needed
+SUBSYSTEM=="hid", RUN+="gigabyte_mount $env{GIGABYTE_DRIVER} $kernel"
+
+LABEL="gigabyte_end"
