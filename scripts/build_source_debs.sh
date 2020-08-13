@@ -36,7 +36,7 @@ cd "${CWD}"
 
 if [ $result_code = 0 ]; then
     echo -e "${GREEN}Source Deb packages build successfully. Running pbuilder${NC}"
-    sudo pbuilder --build --distribution xenial --architecture amd64 --basetgz /var/cache/pbuilder/xenial-amd64-base.tgz ${TEMP_DIR}/gigabyte_${VERSION}*.dsc
+    pbuilder-dist focal amd64 build ${TEMP_DIR}/opengigabyte_${VERSION}*.dsc
     echo -e "${BLUE}Temp DIR: ${TEMP_DIR}${NC}"
 else
     echo -e "${RED}Failed to generate deb files. Check ${TEMP_DIR}/build.log for more details${NC}"

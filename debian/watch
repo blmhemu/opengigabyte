@@ -1,0 +1,4 @@
+version=4
+opts=repacksuffix=+dfsg,dversionmangle=s/\+dfsg//g,repack,compression=xz,\
+  filenamemangle=s/.+\/v?(\d\S+)\.tar\.gz/opengigabyte-$1\.tar\.gz/ \
+  https://github.com/blmhemu/opengigabyte/tags .*/v?(\d\S+)\.tar\.gz

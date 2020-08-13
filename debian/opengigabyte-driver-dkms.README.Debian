@@ -1,0 +1,38 @@
+OpenRazer for Debian
+-------------------
+
+# Troubleshooting Guide
+# Ref: https://github.com/blmhemu/opengigabyte/wiki/Troubleshooting
+
+
+##### Kernel Headers
+If you get a similar message when running:
+`sudo dkms install opengigabyte-driver/1.0.0`
+
+Please install the kernel headers for your running kernel.
+After they are installed they have to be available at
+`/lib/modules/$(uname -r)/build` otherwise dkms won't find them.
+
+```
+Error! echo
+Your kernel headers for kernel 4.9.0-kali3-amd64 cannot be found at
+/lib/modules/4.9.0-kali3-amd64/build or /lib/modules/4.9.0-kali3-amd64/source.
+```
+
+
+##### plugdev
+#The daemon requires the current user to be in the user group `plugdev`.
+#You will get an error message while running `opengigabyte-daemon -Fv` to indicate that.
+#To fix it, please run `sudo gpasswd -a $USER plugdev`.
+
+
+##### Secure Boot
+If you use Ubuntu, it forces driver signing when secure boot is enabled.
+That prevents DKMS from working so either disable secure boot (easiest).
+Or check the bottom of this issue on how to sign the modules yourself:
+https://github.com/openrazer/openrazer/issues/98 .
+You will know that you encounter this issue when running `sudo modprobe gigabytekbd`
+and getting the output of `modprobe: ERROR: could not insert 'gigabytekbd': Required key not available`
+
+
+ -- Hemanth Bollamreddi <blmhemu@gmail.com>  Tue, 13 Aug 2020 00:00:00 +0200

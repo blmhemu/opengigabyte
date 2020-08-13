@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# This value is default but we need it below
+DEB_DESTDIR=$(CURDIR)/debian/tmp
+
+%:
+	dh $@ --with dkms
+
+override_dh_auto_clean:
+	echo "No need to clean DKMS modules at packages build time."
+	echo "DKMS modules are built at packages installation time."
+
+override_dh_auto_build:
+	echo "No need to build DKMS modules at packages build time."
+	echo "DKMS modules are built at packages installation time."
+
+override_dh_auto_install:
+	$(MAKE) setup_dkms ubuntu_udev_install appstream_install DESTDIR=$(DEB_DESTDIR)
+
+override_dh_install:
+	dh_install --remaining-packages
+
+override_dh_dkms:
+	dh_dkms -p opengigabyte-driver-dkms -- install_files/dkms/dkms.conf
+
+override_dh_gencontrol:
+	dh_gencontrol
