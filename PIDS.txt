@@ -1,0 +1,5 @@
+README.md
+driver/gigabytekbd_driver.h
+driver/gigabytekbd_driver.c
+install_files/udev/99-gigabyte.rules
+install_files/appstream/io.github.blmhemu.opengigabyte.metainfo.xml
