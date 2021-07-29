@@ -9,7 +9,7 @@ A collection of Linux drivers of various components for Gigabyte devices.
 - [ ] Make Fn + ESC/F2/F5/F10/F11/F12 work.
 - [ ] Make the C code into actual driver and ppa support.
 - [ ] Look into the possibility of full keyboard RGB backlight support.
-- [ ] Look into controlling fan profiles with [Fn + Esc] 
+- [ ] Look into controlling fan profiles with [Fn + Esc]
 - [ ] Add into the main linux kernel ??
 
 ## Supported Devices
@@ -19,10 +19,12 @@ A collection of Linux drivers of various components for Gigabyte devices.
 | Gigabyte Aero 15X V8                          |  1044:7A39  |
 | Gigabyte Aero 15X V9                          |  1044:7A39  |
 | Gigabyte Aero 15 SA                           |  1044:7A3F  |
+| Gigabyte Aorus 15G                            |  1044:7A3C  |
+
 
 ## Install Instructions
 
-### Ubuntu : 
+### Ubuntu :
 ```
 sudo add-apt-repository ppa:blmhemu/opengigabyte
 sudo apt update
@@ -41,7 +43,7 @@ pacman -S openaero-meta
 * The keyboard driver converts the obscure key codes from the keyboard into standard keycodes. Handling the functionality of the keys is up to the user.
   * For example, link the BrightnessUp / BrightnessDown keyboard symbol to [light utility](https://github.com/haikarainen/light) or xbacklight to control brightness using the keys.
 
-## Releases / Changelog 
+## Releases / Changelog
 https://github.com/blmhemu/opengigabyte/releases
 
 ## Credits

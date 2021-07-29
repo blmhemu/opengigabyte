@@ -5,7 +5,7 @@ GOTO="gigabyte_end"
 LABEL="gigabyte_vendor"
 
 # Keyboards
-ATTRS{idProduct}=="7A39|7A3F", \
+ATTRS{idProduct}=="7A39|7A3F|7A3C", \
     ATTRS{idVendor}=="1044", \
     ENV{GIGABYTE_DRIVER}="gigabytekbd"
 
