@@ -68,6 +68,7 @@ static int gigabyte_kbd_probe(struct hid_device *hdev, const struct hid_device_i
 static const struct hid_device_id gigabyte_kbd_devices[] = {
 	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AERO15XV8, USB_DEVICE_ID_GIGABYTE_AERO15XV8)},
 	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AERO15SA, USB_DEVICE_ID_GIGABYTE_AERO15SA)},
+	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AORUS15G, USB_DEVICE_ID_GIGABYTE_AORUS15G)},
 	{}
 };
 MODULE_DEVICE_TABLE(hid, gigabyte_kbd_devices);
