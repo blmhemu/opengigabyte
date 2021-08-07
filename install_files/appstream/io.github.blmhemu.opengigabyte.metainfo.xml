@@ -3,7 +3,7 @@
   <id>io.github.blmhemu.opengigabyte</id>
   <project_license>GPL-2.0+</project_license>
   <name>OpenGigabyte</name>
-  <summary>Drivers for Aero peripherals on GNU/Linux</summary>
+  <summary>Drivers for Gigabyte peripherals on GNU/Linux</summary>
   <description>
     <p>
       OpenGigabyte is a collection of GNU/Linux drivers for the Gigabyte devices.
@@ -16,5 +16,6 @@
   <provides>
     <modalias>usb:v1044p7A39d*</modalias>
     <modalias>usb:v1044p7A3Fd*</modalias>
+    <modalias>usb:v1044p7A3Cd*</modalias>
   </provides>
 </component>
