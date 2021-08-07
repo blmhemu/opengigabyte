@@ -31,12 +31,10 @@ sudo apt update
 sudo apt install opengigabyte-driver-dkms
 ```
 
-### Arch :
-
-*Note:* Currently un-maintained
+### Arch Linux :
+Install [opengigabyte-meta]() from the AUR using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers#Pacman_wrappers). For example:
 ```
-pacman -S linux-headers
-pacman -S openaero-meta
+yay -S opengigabyte-meta
 ```
 
 ## Notes
