@@ -20,6 +20,8 @@ A collection of Linux drivers of various components for Gigabyte devices.
 | Gigabyte Aero 15X V9                          |  1044:7A39  |
 | Gigabyte Aero 15 SA                           |  1044:7A3F  |
 | Gigabyte Aorus 15G                            |  1044:7A3C  |
+| Gigabyte Aorus 17G YC (RTX 30 series)         |  1044:7A3C  |
+
 
 
 ## Install Instructions
