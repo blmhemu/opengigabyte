@@ -51,4 +51,4 @@ https://github.com/blmhemu/opengigabyte/releases
 * [OpenRazer](https://openrazer.github.io/)
 
 ---
-OpenGigabyte is licensed under the GPL and not officially endorsed by [Gigabyte, Ltd](https://www.gigabyte.com//)
+OpenGigabyte is licensed under the GPL and not officially endorsed by [Gigabyte, Ltd](https://www.gigabyte.com)
