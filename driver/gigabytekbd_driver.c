@@ -103,13 +103,9 @@ static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *re
 			if (gigabyte_kbd_is_backlight_off())
 				return 0;
 
-			rd[0] = 0x03;
-			rd[1] = 0x6f;
-			rd[2] = 0x00;
+			rd[0] = 0x03;rd[1] = 0x6f;rd[2] = 0x00;
 			hid_report_raw_event(hdev, HID_INPUT_REPORT, rd, 4, 0);
-			rd[0] = 0x03;
-			rd[1] = 0x00;
-			rd[2] = 0x00;
+			rd[0] = 0x03;rd[1] = 0x00;rd[2] = 0x00;
 			return 1;
 		case HIDRAW_FN_F6:
 			if (gigabyte_kbd_backlight_device)
