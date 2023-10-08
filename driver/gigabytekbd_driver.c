@@ -34,6 +34,7 @@ MODULE_LICENSE("GPL v2");
 #define MOD_CODE_LEFT_CTRL 0x01
 #define MOD_CODE_LEFT_SUPER 0x08
 
+#define KEY_CODE_P 0x13
 #define KEY_CODE_XF86_TOUCHPAD_OFF 0x72
 #define KEY_CODE_MYSTERIOUS 0x73
 
@@ -92,7 +93,10 @@ static int gigabyte_kbd_raw_event_aero17xe5(struct hid_device *hdev, struct hid_
 		}
 		// Holding Fn+Super.
 		else if (data->fn_f10_seq == 2 && rd[0] & MOD_CODE_LEFT_SUPER && rd[2] == KEY_CODE_XF86_TOUCHPAD_OFF && !memchr(&rd[3], KEY_CODE_MYSTERIOUS, 33)) {
-			rd[0] &= ~MOD_CODE_LEFT_SUPER;
+			// This check is needed to passthrough Fn+F5 which generates Super+p sequence which is used for changing video setup (for Windows it works in the same way though).
+			if (!memchr(&rd[3], KEY_CODE_P, 33)) {
+				rd[0] &= ~MOD_CODE_LEFT_SUPER;
+			}
 			if (data->fn_f10_ctrl_down) {
 				rd[0] &= ~MOD_CODE_LEFT_CTRL;
 			}
