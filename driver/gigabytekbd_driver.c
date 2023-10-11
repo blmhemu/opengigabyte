@@ -31,15 +31,6 @@ MODULE_LICENSE("GPL v2");
 
 #define make_u32(a, b, c, d) a << 24 | b << 16 | c << 8 | d
 
-// /sys/class/backlight/intel_backlight
-#define GIGABYTE_KBD_BACKLIGHT_DEVICE_NAME "intel_backlight" 
-
-// touchpad device is in /sys/bus/i2c/devices/i2c-PNP0C50:01
-// these values stay consistent through the kernels I tested
-#define GIGABYTE_KBD_TOUCHPAD_DEVICE_HID "PNP0C50" 
-#define GIGABYTE_KBD_TOUCHPAD_DEVICE_BID "TPD0" 
-#define GIGABYTE_KBD_TOUCHPAD_DEVICE_INSTANCE_NO 1
-
 struct backlight_device* gigabyte_kbd_backlight_device;
 struct device_driver* gigabyte_kbd_touchpad_driver;
 struct device* gigabyte_kbd_touchpad_device;
@@ -129,16 +120,28 @@ static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *re
 
 static int gigabyte_kbd_match_touchpad_device(struct device *dev, const void *adev)
 {
-	struct acpi_device* acpi = ACPI_COMPANION(dev); // cast the device as an acpi device
+	struct acpi_device* acpi;
+	const char* hid;
+	char* bid;
+	int instance_no, i;
 
+	acpi = ACPI_COMPANION(dev); // cast the device as an acpi device
 	if (acpi)
 	{
-		// printk("hid: %s, bid: %s, instance_no=%d", acpi_device_hid(acpi), acpi_device_bid(acpi), acpi->pnp.instance_no);
-		return (!strcmp(GIGABYTE_KBD_TOUCHPAD_DEVICE_HID, acpi_device_hid(acpi))
-			&& !strcmp(GIGABYTE_KBD_TOUCHPAD_DEVICE_BID, acpi_device_bid(acpi))
-			&& GIGABYTE_KBD_TOUCHPAD_DEVICE_INSTANCE_NO == acpi->pnp.instance_no
-		);
-		
+		hid = acpi_device_hid(acpi);
+		bid = acpi_device_bid(acpi);
+		instance_no = acpi->pnp.instance_no;
+
+		// printk("hid: %s, bid: %s, instance_no=%d", hid, bid, instance_no);
+		for (i = 0; i < sizeof(gigabyte_kbd_touchpad_device_identifiers) / sizeof(struct gigabyte_kbd_touchpad_device_identifier); i++)
+		{
+			if (!strcmp(gigabyte_kbd_touchpad_device_identifiers[i].hid, hid)
+				&& !strcmp(gigabyte_kbd_touchpad_device_identifiers[i].bid, bid)
+				&& gigabyte_kbd_touchpad_device_identifiers[i].instance_no == instance_no)
+			{
+				return 1;
+			}
+		}
 	}
 	return 0;
 }
@@ -146,6 +149,7 @@ static int gigabyte_kbd_match_touchpad_device(struct device *dev, const void *ad
 static int gigabyte_kbd_probe(struct hid_device *hdev, const struct hid_device_id *id)
 {
 	// printk("Gigabyte kbd driver loaded.");
+
 	int ret;
 	hdev->quirks |= HID_QUIRK_INPUT_PER_APP;
 
@@ -162,11 +166,7 @@ static int gigabyte_kbd_probe(struct hid_device *hdev, const struct hid_device_i
 	}
 	else
 	{
-		printk(KERN_ERR "Touchpad acpi device %s:%d (%s) not found",
-			GIGABYTE_KBD_TOUCHPAD_DEVICE_HID,
-			GIGABYTE_KBD_TOUCHPAD_DEVICE_INSTANCE_NO,
-			GIGABYTE_KBD_TOUCHPAD_DEVICE_BID
-		);
+		printk(KERN_ERR "Touchpad acpi device not found");
 	}
 
 	return hid_hw_start(hdev, HID_CONNECT_DEFAULT);
