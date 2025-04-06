@@ -5,9 +5,10 @@ A collection of Linux drivers of various components for Gigabyte devices.
 ### Keyboard
 - [x] All normal keys (alphanumerics and special character) working beforehand.
 - [x] Make the C code into actual driver and ppa support.
-- [x] Sleep, Mute, Volume Keys, Backlight [Fn + F1/F7/F8/F9/SPC] working even before this driver.
+- [x] Sleep, Mute, Volume Keys, Backlight [Fn + F1/F7/F8/F9/F11/SPC] working even before this driver.
 - [x] Brightness keys [Fn + F3/F4] working with this driver.
-- [ ] Make Fn + ESC/F2/F5/F10/F11/F12 work.
+- [x] Touchpad on/off [Fn + F10] working with this driver.
+- [ ] Make Fn + ESC/F2/F5/F12 work.
 - [ ] Look into controlling fan profiles with [Fn + Esc]
 - [ ] Look into the possibility of full keyboard RGB backlight support.
 - [ ] Add into the main linux kernel ?
@@ -18,12 +19,11 @@ A collection of Linux drivers of various components for Gigabyte devices.
 | --------------------------------------------- | ----------- |
 | Gigabyte Aero 15X V8                          |  1044:7A39  |
 | Gigabyte Aero 15X V9                          |  1044:7A39  |
+| Gigabyte Aorus 15 XE4                         |  1044:7A3B  |
 | Gigabyte Aero 15 SA                           |  1044:7A3F  |
 | Gigabyte Aorus 15P (RTX 30 series)            |  1044:7A3B  |
 | Gigabyte Aorus 15G                            |  1044:7A3C  |
 | Gigabyte Aorus 17G YC (RTX 30 series)         |  1044:7A3C  |
-
-
 
 ## Install Instructions
 
