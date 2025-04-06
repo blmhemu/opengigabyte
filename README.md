@@ -1,5 +1,5 @@
 # OpenGigabyte
-A collection of Linux drivers of various components for Gigabyte devices.
+Linux drivers for Gigabyte devices.
 
 ## What's Done
 ### Keyboard
@@ -29,26 +29,28 @@ A collection of Linux drivers of various components for Gigabyte devices.
 
 ### Ubuntu :
 ```
-sudo add-apt-repository ppa:blmhemu/opengigabyte
+sudo add-apt-repository ppa:jqnfxa/opengigabyte
 sudo apt update
 sudo apt install opengigabyte-driver-dkms
 ```
 
 ### Arch Linux :
-Install [opengigabyte-meta]() from the AUR using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers#Pacman_wrappers). For example:
+Install [opengigabyte-meta]() from the AUR using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers#Pacman_wrappers). 
+For example:
 ```
 yay -S opengigabyte-meta
 ```
 
 ## Notes
 * The keyboard driver converts the obscure key codes from the keyboard into standard keycodes. Handling the functionality of the keys is up to the user.
-  * For example, link the BrightnessUp / BrightnessDown keyboard symbol to [light utility](https://github.com/haikarainen/light) or xbacklight to control brightness using the keys.
+* For example, link the BrightnessUp / BrightnessDown keyboard symbol to [light utility](https://github.com/haikarainen/light) or xbacklight to control brightness using the keys.
 
 ## Releases / Changelog
-https://github.com/blmhemu/opengigabyte/releases
+https://github.com/jqfxa/opengigabyte/releases
 
 ## Credits
 * [OpenRazer](https://openrazer.github.io/)
+* [blmhemu](https://github.com/blmhemu)
 
 ---
 OpenGigabyte is licensed under the GPL and not officially endorsed by [Gigabyte, Ltd](https://www.gigabyte.com)
