@@ -9,6 +9,10 @@ ATTRS{idProduct}=="7A39|7A3F|7A3B|7A3C", \
     ATTRS{idVendor}=="1044", \
     ENV{GIGABYTE_DRIVER}="gigabytekbd"
 
+ATTRS{idProduct}=="8005", \
+    ATTRS{idVendor}=="0414", \
+    ENV{GIGABYTE_DRIVER}="gigabytekbd"
+
 # Set permissions if this is an input node
 # SUBSYSTEM=="input|hid", GROUP:="plugdev"
 
