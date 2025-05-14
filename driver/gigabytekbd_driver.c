@@ -54,7 +54,7 @@ static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *re
 
 static int gigabyte_kbd_probe(struct hid_device *hdev, const struct hid_device_id *id)
 {
-	// printk("Gigabyte kbd driver loaded.");
+	printk("Gigabyte kbd driver loaded.");
 	int ret;
 	hdev->quirks |= HID_QUIRK_INPUT_PER_APP;
 
@@ -70,6 +70,7 @@ static const struct hid_device_id gigabyte_kbd_devices[] = {
 	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AERO15SA, USB_DEVICE_ID_GIGABYTE_AERO15SA)},
 	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AORUS15P, USB_DEVICE_ID_GIGABYTE_AORUS15P)},
 	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AORUS15G, USB_DEVICE_ID_GIGABYTE_AORUS15G)},
+	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AORUS16X, USB_DEVICE_ID_GIGABYTE_AORUS16X)},
 	{}
 };
 MODULE_DEVICE_TABLE(hid, gigabyte_kbd_devices);
