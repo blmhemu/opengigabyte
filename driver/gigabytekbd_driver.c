@@ -6,6 +6,11 @@
 
 #include <linux/hid.h>
 #include <linux/module.h>
+#include <linux/string.h>
+#include <linux/workqueue.h>
+#include <linux/backlight.h>
+#include <linux/device.h>
+#include <linux/acpi.h>
 #include "gigabytekbd_driver.h"
 
 MODULE_AUTHOR("Hemanth Bollamreddi <blmhemu@gmail.com>");
@@ -26,6 +31,49 @@ MODULE_LICENSE("GPL v2");
 
 #define make_u32(a, b, c, d) a << 24 | b << 16 | c << 8 | d
 
+struct backlight_device* gigabyte_kbd_backlight_device;
+struct device_driver* gigabyte_kbd_touchpad_driver;
+struct device* gigabyte_kbd_touchpad_device;
+
+static inline int gigabyte_kbd_is_backlight_off(void)
+{
+	return gigabyte_kbd_backlight_device->props.power == FB_BLANK_POWERDOWN;
+}
+
+static void gigabyte_kbd_backlight_toggle(struct work_struct* s)
+{
+	if (gigabyte_kbd_is_backlight_off())
+	{
+		backlight_enable(gigabyte_kbd_backlight_device);
+	}
+	else
+	{
+		backlight_disable(gigabyte_kbd_backlight_device);
+	}
+}
+
+static void gigabyte_kbd_touchpad_toggle_driver(struct work_struct* s)
+{
+	int err;
+	if (gigabyte_kbd_touchpad_device->driver)
+	{
+		// Toggle off
+		gigabyte_kbd_touchpad_driver = gigabyte_kbd_touchpad_device->driver;
+		device_release_driver(gigabyte_kbd_touchpad_device);
+	}
+	else if (gigabyte_kbd_touchpad_driver)
+	{
+		// Toggle on
+		err = device_driver_attach(gigabyte_kbd_touchpad_driver, gigabyte_kbd_touchpad_device);
+		(void)err; // Avoid compiler warning
+	}
+}
+
+// We have to call device functions outside of the event thread (othewise the system crashes),
+// thus we use linux's work queue system
+DECLARE_WORK(gigabyte_kbd_backlight_toggle_work, gigabyte_kbd_backlight_toggle);
+DECLARE_WORK(gigabyte_kbd_touchpad_toggle_driver_work, gigabyte_kbd_touchpad_toggle_driver);
+
 static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *report, u8 *rd, int size)
 {
 	if (report->id == 4 && size == 4)
@@ -35,18 +83,64 @@ static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *re
 		switch (hidraw)
 		{
 		case HIDRAW_FN_F3:
+			if (gigabyte_kbd_is_backlight_off())
+				return 0;
+
 			rd[0] = 0x03;rd[1] = 0x70;rd[2] = 0x00;
 			hid_report_raw_event(hdev, HID_INPUT_REPORT, rd, 4, 0);
 			rd[0] = 0x03;rd[1] = 0x00;rd[2] = 0x00;
 			return 1;
 		case HIDRAW_FN_F4:
+			if (gigabyte_kbd_is_backlight_off())
+				return 0;
+
 			rd[0] = 0x03;rd[1] = 0x6f;rd[2] = 0x00;
 			hid_report_raw_event(hdev, HID_INPUT_REPORT, rd, 4, 0);
 			rd[0] = 0x03;rd[1] = 0x00;rd[2] = 0x00;
 			return 1;
+		case HIDRAW_FN_F6:
+			if (gigabyte_kbd_backlight_device)
+			{
+				schedule_work(&gigabyte_kbd_backlight_toggle_work);
+			}
+			return 0;
+		case HIDRAW_FN_F10:
+			if (gigabyte_kbd_touchpad_device)
+			{
+				schedule_work(&gigabyte_kbd_touchpad_toggle_driver_work);
+			}
+			return 0;
 		default:
 			return 0;
 			break;
+		}
+	}
+	return 0;
+}
+
+static int gigabyte_kbd_match_touchpad_device(struct device *dev, const void *adev)
+{
+	struct acpi_device* acpi;
+	const char* hid;
+	char* bid;
+	int instance_no, i;
+
+	acpi = ACPI_COMPANION(dev); // cast the device as an acpi device
+	if (acpi)
+	{
+		hid = acpi_device_hid(acpi);
+		bid = acpi_device_bid(acpi);
+		instance_no = acpi->pnp.instance_no;
+
+		// printk("hid: %s, bid: %s, instance_no=%d", hid, bid, instance_no);
+		for (i = 0; i < sizeof(gigabyte_kbd_touchpad_device_identifiers) / sizeof(struct gigabyte_kbd_touchpad_device_identifier); i++)
+		{
+			if (!strcmp(gigabyte_kbd_touchpad_device_identifiers[i].hid, hid)
+				&& !strcmp(gigabyte_kbd_touchpad_device_identifiers[i].bid, bid)
+				&& gigabyte_kbd_touchpad_device_identifiers[i].instance_no == instance_no)
+			{
+				return 1;
+			}
 		}
 	}
 	return 0;
@@ -61,6 +155,18 @@ static int gigabyte_kbd_probe(struct hid_device *hdev, const struct hid_device_i
 	ret = hid_parse(hdev);
 	if (ret)
 		return ret;
+
+ 	gigabyte_kbd_backlight_device = backlight_device_get_by_name(GIGABYTE_KBD_BACKLIGHT_DEVICE_NAME);
+	gigabyte_kbd_touchpad_device = bus_find_device(&i2c_bus_type, NULL, NULL, gigabyte_kbd_match_touchpad_device);
+	
+	if (gigabyte_kbd_touchpad_device)
+	{
+		gigabyte_kbd_touchpad_driver = gigabyte_kbd_touchpad_device->driver;
+	}
+	else
+	{
+		printk(KERN_ERR "Touchpad acpi device not found");
+	}
 
 	return hid_hw_start(hdev, HID_CONNECT_DEFAULT);
 }
