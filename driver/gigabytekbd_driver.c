@@ -34,6 +34,9 @@ MODULE_LICENSE("GPL v2");
 #define HIDRAW_FN_F11 0x04000082
 #define HIDRAW_FN_F12 0x04000083
 
+// HID keyboard page usage for KeyboardF20, reported by the Fn key on some models.
+#define HID_USAGE_KEYBOARD_F20 0x6f
+
 #define make_u32(a, b, c, d) a << 24 | b << 16 | c << 8 | d
 
 struct backlight_device* gigabyte_kbd_backlight_device;
@@ -148,6 +151,25 @@ static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *re
 	return 0;
 }
 
+static int gigabyte_kbd_input_mapping(struct hid_device *hdev, struct hid_input *hi,
+	struct hid_field *field, struct hid_usage *usage, unsigned long **bit, int *max)
+{
+	// On the Aorus 16X the Fn key reports KeyboardF20 as an ordinary key press on
+	// top of acting as a hardware modifier. Userspace reads KEY_F20 as the mic mute
+	// key, so every Fn press (i.e. every Fn combo) toggles the microphone. Report it
+	// as KEY_FN instead, which desktop environments ignore.
+	// Only done for models known to do this - other Gigabyte laptops have macro keys
+	// that legitimately emit the F13-F24 range.
+	if (hdev->product == USB_DEVICE_ID_GIGABYTE_AORUS16X
+		&& (usage->hid & HID_USAGE_PAGE) == HID_UP_KEYBOARD
+		&& (usage->hid & HID_USAGE) == HID_USAGE_KEYBOARD_F20)
+	{
+		hid_map_usage_clear(hi, usage, bit, max, EV_KEY, KEY_FN);
+		return 1;
+	}
+	return 0;
+}
+
 static int gigabyte_kbd_match_touchpad_device(struct device *dev, const void *adev)
 {
 	struct acpi_device* acpi;
@@ -233,5 +255,6 @@ static struct hid_driver gigabyte_kbd_driver = {
 	.name = "gigabytekbd",
 	.id_table = gigabyte_kbd_devices,
 	.probe = gigabyte_kbd_probe,
+	.input_mapping = gigabyte_kbd_input_mapping,
 	.raw_event = gigabyte_kbd_raw_event};
 module_hid_driver(gigabyte_kbd_driver);
