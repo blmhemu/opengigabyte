@@ -40,11 +40,12 @@ struct backlight_device* gigabyte_kbd_backlight_device;
 struct device_driver* gigabyte_kbd_touchpad_driver;
 struct device* gigabyte_kbd_touchpad_device;
 struct input_dev* gigabyte_kbd_input_device;
+static struct backlight_device *gigabyte_kbd_find_backlight(void);
 
 static inline int gigabyte_kbd_is_backlight_off(void)
 {
 	if (!gigabyte_kbd_backlight_device)
-		return 1;
+		return 0;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 0, 0)
 	return backlight_is_blank(gigabyte_kbd_backlight_device);
@@ -96,8 +97,6 @@ static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *re
 		switch (hidraw)
 		{
 		case HIDRAW_FN_F3:
-			if (gigabyte_kbd_is_backlight_off())
-				return 0;
 
 			rd[0] = 0x03;rd[1] = 0x70;rd[2] = 0x00;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 0, 0)
@@ -108,8 +107,6 @@ static int gigabyte_kbd_raw_event(struct hid_device *hdev, struct hid_report *re
 			rd[0] = 0x03;rd[1] = 0x00;rd[2] = 0x00;
 			return 1;
 		case HIDRAW_FN_F4:
-			if (gigabyte_kbd_is_backlight_off())
-				return 0;
 
 			rd[0] = 0x03;rd[1] = 0x6f;rd[2] = 0x00;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 0, 0)
@@ -186,17 +183,20 @@ static int gigabyte_kbd_probe(struct hid_device *hdev, const struct hid_device_i
 	ret = hid_parse(hdev);
 	if (ret)
 		return ret;
-
- 	gigabyte_kbd_backlight_device = backlight_device_get_by_name(GIGABYTE_KBD_BACKLIGHT_DEVICE_NAME);
-	gigabyte_kbd_touchpad_device = bus_find_device(&i2c_bus_type, NULL, NULL, gigabyte_kbd_match_touchpad_device);
-
-	if (gigabyte_kbd_touchpad_device)
+	if (!gigabyte_kbd_backlight_device)
+	 	gigabyte_kbd_backlight_device = gigabyte_kbd_find_backlight();
+	if (!gigabyte_kbd_touchpad_device)
 	{
-		gigabyte_kbd_touchpad_driver = gigabyte_kbd_touchpad_device->driver;
-	}
-	else
-	{
-		printk(KERN_ERR "Touchpad acpi device not found");
+		gigabyte_kbd_touchpad_device = bus_find_device(&i2c_bus_type, NULL, NULL, gigabyte_kbd_match_touchpad_device);
+
+		if (gigabyte_kbd_touchpad_device)
+		{
+			gigabyte_kbd_touchpad_driver = gigabyte_kbd_touchpad_device->driver;
+		}
+		else
+		{
+			printk(KERN_ERR "Touchpad acpi device not found");
+		}
 	}
 
 	ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
@@ -216,6 +216,28 @@ static int gigabyte_kbd_probe(struct hid_device *hdev, const struct hid_device_i
 	return 0;
 }
 
+static struct backlight_device *gigabyte_kbd_find_backlight(void)
+{
+    static const char * const names[] = {
+        "intel_backlight",
+        "nvidia_0",
+        "nvidia_wmi_ec_backlight",
+        "amdgpu_bl0",
+        "acpi_video0",
+    };
+
+    struct backlight_device *bd;
+    int i;
+
+    for (i = 0; i < ARRAY_SIZE(names); i++) {
+        bd = backlight_device_get_by_name(names[i]);
+        if (bd)
+            return bd;
+    }
+
+    return NULL;
+}
+
 static const struct hid_device_id gigabyte_kbd_devices[] = {
 	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AERO15XV8, USB_DEVICE_ID_GIGABYTE_AERO15XV8)},
 	{HID_USB_DEVICE(USB_VENDOR_ID_GIGABYTE_AERO15SA, USB_DEVICE_ID_GIGABYTE_AERO15SA)},
@@ -233,5 +255,32 @@ static struct hid_driver gigabyte_kbd_driver = {
 	.name = "gigabytekbd",
 	.id_table = gigabyte_kbd_devices,
 	.probe = gigabyte_kbd_probe,
-	.raw_event = gigabyte_kbd_raw_event};
-module_hid_driver(gigabyte_kbd_driver);
+	.raw_event = gigabyte_kbd_raw_event,
+};
+
+static int __init gigabyte_kbd_init(void)
+{
+	return hid_register_driver(&gigabyte_kbd_driver);
+}
+
+static void  __exit gigabyte_kbd_exit(void)
+{
+	hid_unregister_driver(&gigabyte_kbd_driver);
+
+	cancel_work_sync(&gigabyte_kbd_backlight_toggle_work);
+	cancel_work_sync(&gigabyte_kbd_touchpad_toggle_driver_work);
+
+	if (gigabyte_kbd_backlight_device) {
+		put_device(&gigabyte_kbd_backlight_device->dev);
+		gigabyte_kbd_backlight_device = NULL;
+	}
+
+	if (gigabyte_kbd_touchpad_device) {
+		put_device(gigabyte_kbd_touchpad_device);
+		gigabyte_kbd_touchpad_device = NULL;
+		gigabyte_kbd_touchpad_driver = NULL;
+	}
+}
+
+module_init(gigabyte_kbd_init);
+module_exit(gigabyte_kbd_exit);
