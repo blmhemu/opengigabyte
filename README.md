@@ -44,11 +44,86 @@ sudo apt install dkms build-essential dh-make dh-dkms
 ./scripts/build_debs.sh
 sudo dpkg -i ./dist/opengigabyte-driver-dkms_0.0.2-0_all.deb
 ```
+### Rocky Linux / RHEL based distros :
 
+Install required build dependencies and DKMS:
+```
+sudo dnf install epel-release
+sudo dnf install dkms gcc make kernel-devel-$(uname -r) kernel-headers
+```
+
+Clone the repo:
+```
+git clone https://github.com/blmhemu/opengigabyte.git
+cd opengigabyte
+```
+
+Install the driver source into the DKMS source tree:
+```
+sudo make setup_dkms
+```
+
+Register, build, and install the driver module:
+```
+sudo dkms add -m opengigabyte-driver -v 0.0.2
+sudo dkms build -m opengigabyte-driver -v 0.0.2
+sudo dkms install -m opengigabyte-driver -v 0.0.2
+```
+
+Install and reload the udev rules:
+```
+sudo make udev_install
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+Load the driver:
+```
+sudo modprobe gigabytekbd
+```
+
+Verify the installation has succeeded:
+```
+dkms status
+lsmod | grep gigabyte
+```
+
+**Tested on Rocky Linux 10.2 with kernel 6.12.0-211.58.1.el10_2.x86_64.**
 ### Arch Linux :
 Install [opengigabyte-meta]() from the AUR using an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers#Pacman_wrappers). For example:
 ```
 yay -S opengigabyte
+```
+## Uninstall Instructions
+
+### Rocky Linux / RHEL based distros :
+
+Unload the kernel module:
+```
+sudo modprobe -r gigabytekbd
+```
+
+Remove the driver from DKMS:
+```
+sudo dkms remove -m opengigabyte-driver -v 0.0.2 --all
+```
+
+Remove the udev rules:
+```
+sudo make udev_uninstall
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+Remove the DKMS source files:
+```
+sudo make remove_dkms
+```
+
+Verify the driver has been uninstalled successfully:
+```
+dkms status
+lsmod | grep gigabyte
 ```
 
 ## Notes
